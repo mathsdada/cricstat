@@ -1,3 +1,5 @@
+package Model;
+
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -13,7 +15,7 @@ public class PlayerBowlingScore {
     private String mWides;
     private String mEconomy;
 
-    public PlayerBowlingScore(String player,
+    private PlayerBowlingScore(String player,
                               String overs, String maidens, String wickets, String noBalls, String wides,
                               String runs, String economy) {
         mPlayer = player;
@@ -26,7 +28,7 @@ public class PlayerBowlingScore {
         mEconomy = economy;
     }
 
-    static PlayerBowlingScore extractPlayerBowlingScore(Element bowlingScoreElement) {
+    public static PlayerBowlingScore extractPlayerBowlingScore(Element bowlingScoreElement) {
         Element bowlerElement = bowlingScoreElement.select("div.cb-col.cb-col-40").first();
         if (bowlerElement == null) {
             return null;

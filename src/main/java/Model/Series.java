@@ -1,4 +1,6 @@
-import Utilities.ScraperUtils;
+package Model;
+
+import Utility.ScraperUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -26,9 +28,9 @@ public class Series {
 
     private void extractSeriesData() {
         Document seriesDocument = ScraperUtils.getDocument(mUrl);
-        // extract Series Formats
+        // extract Model.Series Formats
         mSeriesFormat = getSeriesFormat(seriesDocument);
-        // Extract Series Matches
+        // Extract Model.Series Matches
         ArrayList<Match> seriesMatchList = getSeriesMatchList(seriesDocument);
         for (Match match: seriesMatchList) {
             match.scrape();

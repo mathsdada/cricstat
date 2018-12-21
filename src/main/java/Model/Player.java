@@ -1,3 +1,6 @@
+package Model;
+
+import Configuration.Config;
 import org.jsoup.nodes.Element;
 
 public class Player {
@@ -11,7 +14,7 @@ public class Player {
         mId = url.split("/")[2];
         mUrl = Config.HOMEPAGE + url;
         mName = correctName(playerElement.text());
-        System.out.println("Player: " + mId + " " + mName + " " + mUrl);
+        System.out.println("Model.Player: " + mId + " " + mName + " " + mUrl);
     }
 
     public String getId() {

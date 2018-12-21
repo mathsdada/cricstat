@@ -1,3 +1,5 @@
+package Model;
+
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -12,7 +14,7 @@ public class PlayerBattingScore {
     private String mSixes;
     private String mStrikeRate;
 
-    PlayerBattingScore(String player, String status, String runs, String balls, String fours, String sixes, String strikeRate) {
+    private PlayerBattingScore(String player, String status, String runs, String balls, String fours, String sixes, String strikeRate) {
         mPlayer = player;
         mStatus = status;
         mRuns = runs;
@@ -22,7 +24,7 @@ public class PlayerBattingScore {
         mStrikeRate = strikeRate;
     }
 
-    static PlayerBattingScore extractPlayerBattingScore(Element battingScoreElement) {
+    public static PlayerBattingScore extractPlayerBattingScore(Element battingScoreElement) {
         Element batsmanElement = battingScoreElement.select("div.cb-col.cb-col-27").first();
         if (batsmanElement == null) {
             return null;
@@ -32,7 +34,7 @@ public class PlayerBattingScore {
             return null;
         }
         String playerName = Player.correctName(batsmanElement.text());
-        // Player Status
+        // Model.Player Status
         String status = battingScoreElement.selectFirst("div.cb-col.cb-col-33").text();
         // [Runs, Balls, 4s, 6s, SR]
         ArrayList<String> scoreCols = new ArrayList<>(5);

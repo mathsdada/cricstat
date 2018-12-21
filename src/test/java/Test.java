@@ -1,4 +1,5 @@
-import Utilities.StringUtils;
+import Model.Series;
+import Utility.StringUtils;
 
 public class Test {
     public static void main(String args[]) {

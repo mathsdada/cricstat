@@ -1,3 +1,5 @@
+package Model;
+
 public class InningsScoreHeader {
     private String mRuns;
     private String mWickets;
