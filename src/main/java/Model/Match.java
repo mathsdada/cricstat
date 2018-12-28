@@ -1,6 +1,7 @@
 package Model;
 
 import Configuration.Config;
+import Extractor.MatchCommentaryExtractor;
 import Extractor.MatchInfoExtractor;
 import Extractor.MatchScoreExtractor;
 import Utility.ScraperUtils;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 class Match {
+    private String mUrl;
     private String mId;
     private String mTitle;
     private String mFormat;
@@ -22,6 +24,7 @@ class Match {
     private String mWinningTeam;
     private ArrayList<Team> mTeams;
     private ArrayList<InningsScore> mInningsScores;
+    private ArrayList<HeadToHead> mHeadToHeadList;
 
     static Match extractMatchData(Element matchElement, String seriesFormats) {
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor();
@@ -51,13 +54,13 @@ class Match {
         String winningTeam = matchInfoExtractor.extractWinningTeam(status, outcome);
 
         if (url.contains("cricket-scores") && venue != null && status != null && format != null) {
-            return new Match(id, title, format, venue, status, outcome, winningTeam);
+            return new Match(url, id, title, format, venue, status, outcome, winningTeam);
         }
-        System.out.println("Returning NULL");
         return null;
     }
 
-    private Match(String id, String title, String format, String venue, String status, String outcome, String winningTeam) {
+    private Match(String url, String id, String title, String format, String venue, String status, String outcome, String winningTeam) {
+        mUrl = url;
         mId = id;
         mTitle = title;
         mFormat = format;
@@ -70,6 +73,7 @@ class Match {
     void scrape() {
         String scoreCardUrl = Config.HOMEPAGE + "/api/html/cricket-scorecard/" + this.getId();
         Document iScorecardDoc = ScraperUtils.getDocument(scoreCardUrl);
+        Document commentaryDoc = ScraperUtils.getDocument(this.getUrl());
 
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor(iScorecardDoc);
         MatchScoreExtractor matchScoreExtractor = new MatchScoreExtractor();
@@ -77,6 +81,17 @@ class Match {
         this.setDate(matchInfoExtractor.extractMatchDate());
         this.setTeams(matchInfoExtractor.extractPlayingTeams(iScorecardDoc, this.getTitle()));
         this.setInningsScores(matchScoreExtractor.extractMatchScores(iScorecardDoc, this.getTeams()));
+
+        MatchCommentaryExtractor matchCommentaryExtractor = new MatchCommentaryExtractor(commentaryDoc, this.getTeams());
+        this.setHeadToHeadList(matchCommentaryExtractor.getHeadToHead());
+    }
+
+    public String getUrl() {
+        return mUrl;
+    }
+
+    public void setUrl(String url) {
+        mUrl = url;
     }
 
     public String getId() {
@@ -129,6 +144,14 @@ class Match {
 
     private void setInningsScores(ArrayList<InningsScore> inningsScores) {
         mInningsScores = inningsScores;
+    }
+
+    public ArrayList<HeadToHead> getHeadToHeadList() {
+        return mHeadToHeadList;
+    }
+
+    public void setHeadToHeadList(ArrayList<HeadToHead> headToHeadList) {
+        mHeadToHeadList = headToHeadList;
     }
 }
 

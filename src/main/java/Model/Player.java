@@ -14,7 +14,7 @@ public class Player {
         mId = url.split("/")[2];
         mUrl = Config.HOMEPAGE + url;
         mName = correctName(playerElement.text());
-        System.out.println("Model.Player: " + mId + " " + mName + " " + mUrl);
+//        System.out.println("Model.Player: " + mId + " " + mName + " " + mUrl);
     }
 
     public String getId() {

@@ -55,7 +55,6 @@ public class MatchScoreExtractor {
         for (Element battingScoreElement : battingScoreElements) {
             PlayerBattingScore playerBattingScore = PlayerBattingScore.extractPlayerBattingScore(battingScoreElement);
             if (playerBattingScore != null) {
-                System.out.println(playerBattingScore.toString());
                 playerBattingScores.add(playerBattingScore);
             }
         }
@@ -70,7 +69,6 @@ public class MatchScoreExtractor {
         for (Element bowlingScoreElement : bowlingScoreElements) {
             PlayerBowlingScore playerBowlingScore = PlayerBowlingScore.extractPlayerBowlingScore(bowlingScoreElement);
             if (playerBowlingScore != null) {
-                System.out.println(playerBowlingScore.toString());
                 playerBowlingScores.add(playerBowlingScore);
             }
         }
