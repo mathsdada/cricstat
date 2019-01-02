@@ -35,8 +35,10 @@ class Match {
         // Model.Match Title & Link & ID
         String title = matchTitleElement.text();
         String url = matchTitleElement.attr("href");
+        if (!url.contains("cricket-scores")) {
+            return null;
+        }
         String id = url.split(Pattern.quote("/"))[2];
-        url = Config.HOMEPAGE + url;
         // Model.Match Venue
         String venue = null;
         if (matchVenueElement != null) {
@@ -53,8 +55,8 @@ class Match {
         // Model.Match Winning Model.Team
         String winningTeam = matchInfoExtractor.extractWinningTeam(status, outcome);
 
-        if (url.contains("cricket-scores") && venue != null && status != null && format != null) {
-            return new Match(url, id, title, format, venue, status, outcome, winningTeam);
+        if (venue != null && status != null && format != null) {
+            return new Match(Config.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam);
         }
         return null;
     }

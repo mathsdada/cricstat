@@ -1,5 +1,6 @@
 package Model;
 
+import Configuration.Config;
 import Utility.ScraperUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,45 +13,42 @@ public class Series {
     private String mId;
     private String mTitle;
     private String mYear;
-    private String mUrl;
-
-    private String mSeriesFormat;
     private ArrayList<Match> mMatches;
 
-    public Series(String id, String title, String year, String link) {
+    private Series(String id, String title, String year, ArrayList<Match> matches) {
         mId = id;
         mTitle = title;
         mYear = year;
-        mUrl = link;
-        mMatches = new ArrayList<>();
-        extractSeriesData();
+        mMatches = matches;
     }
 
-    private void extractSeriesData() {
-        Document seriesDocument = ScraperUtils.getDocument(mUrl);
-        // extract Model.Series Formats
-        mSeriesFormat = getSeriesFormat(seriesDocument);
-        // Extract Model.Series Matches
-        ArrayList<Match> seriesMatchList = getSeriesMatchList(seriesDocument);
-        for (Match match: seriesMatchList) {
-            match.scrape();
-            mMatches.add(match);
-            break;
+    public static Series extractSeries(Element seriesElement, String year) {
+        String seriesUrl = seriesElement.attr("href");
+        // Validate Url Before proceeding
+        if (!seriesUrl.contains("cricket-series") || seriesUrl.contains("qualifier") || seriesUrl.contains("warm-up") || seriesUrl.contains("practice")) {
+            return null;
         }
+        String seriesId = seriesUrl.split(Pattern.quote("/"))[2];
+        String seriesTitle = seriesElement.text();
+        return new Series(seriesId, seriesTitle, year, getSeriesMatchList(Config.HOMEPAGE + seriesUrl));
     }
 
-    private String getSeriesFormat(Document seriesDocument) {
+    private static String getSeriesFormat(Document seriesDocument) {
         Elements elements = seriesDocument.select("div.cb-col-100.cb-col.cb-nav-main.cb-bg-white").first()
                 .select("div");
         return elements.get(1).text().split(Pattern.quote(" . "))[0];
     }
 
-    private ArrayList<Match> getSeriesMatchList(Document seriesDocument) {
+    private static ArrayList<Match> getSeriesMatchList(String seriesUrl) {
+        Document seriesDocument = ScraperUtils.getDocument(seriesUrl);
+        String seriesFormat = getSeriesFormat(seriesDocument);
         ArrayList<Match> matches = new ArrayList<>();
+
         Elements matchElements = seriesDocument.select("div.cb-col-60.cb-col.cb-srs-mtchs-tm");
         for (Element matchElement: matchElements) {
-            Match match = Match.extractMatchData(matchElement, mSeriesFormat);
+            Match match = Match.extractMatchData(matchElement, seriesFormat);
             if (match != null) {
+                match.scrape();
                 matches.add(match);
             }
         }
