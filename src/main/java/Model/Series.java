@@ -14,14 +14,16 @@ public class Series {
     private String mId;
     private String mTitle;
     private String mYear;
+    private String mUrl;
     private ArrayList<Match> mMatches;
 
 
-    private Series(String id, String title, String year, ArrayList<Match> matches) {
+    private Series(String id, String title, String year, String url) {
         mId = id;
         mTitle = title;
         mYear = year;
-        mMatches = matches;
+        mUrl = url;
+        mMatches = new ArrayList<>();
     }
 
     public static Series extract(Element seriesElement, String year) {
@@ -32,7 +34,23 @@ public class Series {
         }
         String seriesId = seriesUrl.split(Pattern.quote("/"))[2];
         String seriesTitle = seriesElement.text();
-        return new Series(seriesId, seriesTitle, year, getSeriesMatchList(Config.HOMEPAGE + seriesUrl));
+        return new Series(seriesId, seriesTitle, year, Config.HOMEPAGE + seriesUrl);
+    }
+
+    public void scrape() {
+        // Maintain player Cache to avoid repeatedly scraping player profile for each match in a particular series.
+        // This is valid only if all matches of a series gets scraped by single thread. This logic need to changed if threading behavior changes
+        // Key : Player ID, Value : Player
+        HashMap<String, Player> playerCacheMap = new HashMap<>();
+        Document seriesDocument = ScraperUtils.getDocument(mUrl);
+
+        Elements matchElements = seriesDocument.select("div.cb-col-60.cb-col.cb-srs-mtchs-tm");
+        for (Element matchElement: matchElements) {
+            Match match = Match.extract(matchElement, getSeriesFormat(seriesDocument), playerCacheMap);
+            if (match != null) {
+                mMatches.add(match);
+            }
+        }
     }
 
     private static String getSeriesFormat(Document seriesDocument) {
@@ -41,23 +59,7 @@ public class Series {
         return elements.get(1).text().split(Pattern.quote(" . "))[0];
     }
 
-    private static ArrayList<Match> getSeriesMatchList(String seriesUrl) {
-        // Maintain player Cache to avoid repeatedly scraping player profile for each match in a particular series.
-        // This is valid only if all matches of a series gets scraped by single thread. This logic need to changed if threading behavior changes
-        // Key : Player ID, Value : Player
-        HashMap<String, Player> playerCacheMap = new HashMap<>();
-        ArrayList<Match> matches = new ArrayList<>();
-        Document seriesDocument = ScraperUtils.getDocument(seriesUrl);
-
-        Elements matchElements = seriesDocument.select("div.cb-col-60.cb-col.cb-srs-mtchs-tm");
-        for (Element matchElement: matchElements) {
-            Match match = Match.extract(matchElement, getSeriesFormat(seriesDocument));
-            if (match != null) {
-                System.out.println("Scraping " + match.getTitle());
-                match.scrape(playerCacheMap);
-                matches.add(match);
-            }
-        }
-        return matches;
+    public String getTitle() {
+        return mTitle;
     }
 }

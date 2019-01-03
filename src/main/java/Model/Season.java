@@ -7,6 +7,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Season {
     private String mYear;
@@ -18,6 +20,14 @@ public class Season {
         extractSeriesList();
     }
 
+    public String  getYear() {
+        return mYear;
+    }
+
+    public ArrayList<Series> getSeriesList() {
+        return mSeriesList;
+    }
+
     private void extractSeriesList() {
         String seasonUrl = Config.HOMEPAGE + "/cricket-scorecard-archives/" + mYear;
         Document seasonDoc = ScraperUtils.getDocument(seasonUrl);
@@ -26,15 +36,34 @@ public class Season {
             Series series = Series.extract(seriesElement, mYear);
             if (series != null) {
                 mSeriesList.add(series);
-                break;
             }
         }
-    }
-    public String  getYear() {
-        return mYear;
+        runSeriesWorkerThreads(mSeriesList);
     }
 
-    public ArrayList<Series> getSeriesList() {
-        return mSeriesList;
+    private void runSeriesWorkerThreads(ArrayList<Series> seriesList) {
+//        ExecutorService executor = Executors.newFixedThreadPool(10);
+        ExecutorService executor = Executors.newCachedThreadPool();
+        for (Series series: seriesList) {
+            Runnable worker = new SeriesWorkerThread(series);
+            executor.execute(worker);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated()) {}
+        System.out.println("Finished all Worker Threads");
+    }
+
+    private class SeriesWorkerThread implements Runnable {
+        private Series mSeries;
+
+        SeriesWorkerThread(Series series) {
+            mSeries = series;
+        }
+
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName() + mSeries.getTitle());
+            mSeries.scrape();
+        }
     }
 }

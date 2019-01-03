@@ -17,7 +17,7 @@ public class ScraperUtils {
             document = Jsoup.connect(url).get();
         } catch (IOException e) {
             System.out.println("Retrying Link : " + url + " Retry Count : " + retryCount);
-            return getDocumentInternal(url, retryCount);
+            return getDocumentInternal(url, retryCount+1);
         }
         return document;
     }

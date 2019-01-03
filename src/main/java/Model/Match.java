@@ -27,7 +27,7 @@ class Match {
     private ArrayList<InningsScore> mInningsScores;
     private ArrayList<HeadToHead> mHeadToHeadList;
 
-    static Match extract(Element matchElement, String seriesFormats) {
+    static Match extract(Element matchElement, String seriesFormats, HashMap<String, Player> playerCacheMap) {
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor();
 
         Elements matchTitleElement = matchElement.select("a.text-hvr-underline");
@@ -57,12 +57,12 @@ class Match {
         String winningTeam = matchInfoExtractor.extractWinningTeam(status, outcome);
 
         if (venue != null && status != null && format != null) {
-            return new Match(Config.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam);
+            return new Match(Config.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam, playerCacheMap);
         }
         return null;
     }
 
-    private Match(String url, String id, String title, String format, String venue, String status, String outcome, String winningTeam) {
+    private Match(String url, String id, String title, String format, String venue, String status, String outcome, String winningTeam, HashMap<String, Player> playerCacheMap) {
         mUrl = url;
         mId = id;
         mTitle = title;
@@ -71,9 +71,10 @@ class Match {
         mStatus = status;
         mOutcome = outcome;
         mWinningTeam = winningTeam;
+        scrape(playerCacheMap);
     }
 
-    void scrape(HashMap<String, Player> playerCacheMap) {
+    private void scrape(HashMap<String, Player> playerCacheMap) {
         String scoreCardUrl = Config.HOMEPAGE + "/api/html/cricket-scorecard/" + this.getId();
         Document iScorecardDoc = ScraperUtils.getDocument(scoreCardUrl);
         Document commentaryDoc = ScraperUtils.getDocument(this.getUrl());
