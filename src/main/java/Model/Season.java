@@ -23,9 +23,10 @@ public class Season {
         Document seasonDoc = ScraperUtils.getDocument(seasonUrl);
         Elements seriesElements = seasonDoc.select("a.text-hvr-underline");
         for (Element seriesElement: seriesElements) {
-            Series series = Series.extractSeries(seriesElement, mYear);
+            Series series = Series.extract(seriesElement, mYear);
             if (series != null) {
                 mSeriesList.add(series);
+                break;
             }
         }
     }

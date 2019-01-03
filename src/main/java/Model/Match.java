@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 
 class Match {
@@ -26,7 +27,7 @@ class Match {
     private ArrayList<InningsScore> mInningsScores;
     private ArrayList<HeadToHead> mHeadToHeadList;
 
-    static Match extractMatchData(Element matchElement, String seriesFormats) {
+    static Match extract(Element matchElement, String seriesFormats) {
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor();
 
         Elements matchTitleElement = matchElement.select("a.text-hvr-underline");
@@ -72,7 +73,7 @@ class Match {
         mWinningTeam = winningTeam;
     }
 
-    void scrape() {
+    void scrape(HashMap<String, Player> playerCacheMap) {
         String scoreCardUrl = Config.HOMEPAGE + "/api/html/cricket-scorecard/" + this.getId();
         Document iScorecardDoc = ScraperUtils.getDocument(scoreCardUrl);
         Document commentaryDoc = ScraperUtils.getDocument(this.getUrl());
@@ -81,7 +82,7 @@ class Match {
         MatchScoreExtractor matchScoreExtractor = new MatchScoreExtractor();
 
         this.setDate(matchInfoExtractor.extractMatchDate());
-        this.setTeams(matchInfoExtractor.extractPlayingTeams(iScorecardDoc, this.getTitle()));
+        this.setTeams(matchInfoExtractor.extractPlayingTeams(iScorecardDoc, this.getTitle(), playerCacheMap));
         this.setInningsScores(matchScoreExtractor.extractMatchScores(iScorecardDoc, this.getTeams()));
 
         MatchCommentaryExtractor matchCommentaryExtractor = new MatchCommentaryExtractor(commentaryDoc, this.getTeams());

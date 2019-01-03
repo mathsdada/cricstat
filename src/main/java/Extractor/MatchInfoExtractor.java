@@ -93,7 +93,7 @@ public class MatchInfoExtractor {
         return null;
     }
 
-    public ArrayList<Team> extractPlayingTeams(Document scorecardDoc, String title) {
+    public ArrayList<Team> extractPlayingTeams(Document scorecardDoc, String title, HashMap<String, Player> playerCacheMap) {
         String shortTitle = mMatchInfo.get("Match");
 
         ArrayList<Team> teams = new ArrayList<>();
@@ -115,7 +115,7 @@ public class MatchInfoExtractor {
                 if (teamName.contains("Squad")) {
                     teamName = teamName.split(Pattern.quote("Squad"))[0].strip();
                     for (Team team : teams) {
-                        if (team.getName().equals(teamName)) {
+                        if (team.getName().toLowerCase().equals(teamName.toLowerCase())) {
                             currentTeam = team;
                             break;
                         }
@@ -123,8 +123,8 @@ public class MatchInfoExtractor {
                 }
             } else {
                 for (Element playerElement : playerElements) {
-                    assert currentTeam != null; // we should not hit this assert
-                    currentTeam.addPlayer(new Player(playerElement));
+                    assert currentTeam != null; // we should not be hitting this assert
+                    currentTeam.addPlayer(Player.extract(playerElement, playerCacheMap));
                 }
             }
         }
