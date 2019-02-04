@@ -18,4 +18,19 @@ public class StringUtils {
         }
         return max;
     }
+
+    public static String correctPlayerName(String name) {
+        name = name
+                .replace("(c)", "")
+                .replace("(wk)", "")
+                .replace("(c & wk)", "")
+                .strip();
+        if (name.endsWith(" sub")) {
+            name = name.replace(" sub", "").strip();
+        } else if (name.endsWith(" Sub")) {
+            name = name.replace(" Sub", "").strip();
+        }
+        return name;
+    }
+
 }

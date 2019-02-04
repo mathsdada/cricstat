@@ -3,6 +3,7 @@ package Extractor;
 import Configuration.Config;
 import Model.Player;
 import Model.Team;
+import Utility.ObjectBuilder;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -75,6 +76,7 @@ public class MatchInfoExtractor {
                 winningTeam = Team.correctTeamName(winningTeam.strip());
             }
         }
+        if (winningTeam != null) winningTeam = winningTeam.toLowerCase();
         return winningTeam;
     }
 
@@ -103,7 +105,7 @@ public class MatchInfoExtractor {
         String[] fullNames = title.split(Pattern.quote(","))[0].split(Pattern.quote(" vs "));
         String[] shortNames = shortTitle.split(Pattern.quote(","))[0].split(Pattern.quote(" vs "));
         for (int index = 0; index < fullNames.length; index++) {
-            teams.add(new Team(fullNames[index], shortNames[index]));
+            teams.add(new Team(fullNames[index].toLowerCase(), shortNames[index].toLowerCase()));
         }
 
         // Extract Squad of Playing Teams
@@ -111,11 +113,11 @@ public class MatchInfoExtractor {
         for (Element squadElement : squadElements) {
             Elements playerElements = squadElement.select("a.margin0.text-black.text-hvr-underline");
             if (playerElements.size() == 0) {
-                String teamName = squadElement.text();
-                if (teamName.contains("Squad")) {
-                    teamName = teamName.split(Pattern.quote("Squad"))[0].strip();
+                String teamName = squadElement.text().toLowerCase();
+                if (teamName.contains("squad")) {
+                    teamName = teamName.split(Pattern.quote("squad"))[0].strip();
                     for (Team team : teams) {
-                        if (team.getName().toLowerCase().equals(teamName.toLowerCase())) {
+                        if (team.getName().equals(teamName)) {
                             currentTeam = team;
                             break;
                         }
@@ -124,7 +126,7 @@ public class MatchInfoExtractor {
             } else {
                 for (Element playerElement : playerElements) {
                     assert currentTeam != null; // we should not be hitting this assert
-                    currentTeam.addPlayer(Player.extract(playerElement, playerCacheMap));
+                    currentTeam.addPlayer(ObjectBuilder.Player.build(playerElement, playerCacheMap));
                 }
             }
         }

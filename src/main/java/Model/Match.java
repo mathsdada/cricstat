@@ -6,14 +6,11 @@ import Extractor.MatchInfoExtractor;
 import Extractor.MatchScoreExtractor;
 import Utility.ScraperUtils;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
-class Match {
+public class Match {
     private String mUrl;
     private String mId;
     private String mTitle;
@@ -27,42 +24,7 @@ class Match {
     private ArrayList<InningsScore> mInningsScores;
     private ArrayList<HeadToHead> mHeadToHeadList;
 
-    static Match extract(Element matchElement, String seriesFormats, HashMap<String, Player> playerCacheMap) {
-        MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor();
-
-        Elements matchTitleElement = matchElement.select("a.text-hvr-underline");
-        Elements matchOutcomeElement = matchElement.select("a.cb-text-complete");
-        Elements matchVenueElement = matchElement.select("div.text-gray");
-        // Model.Match Title & Link & ID
-        String title = matchTitleElement.text();
-        String url = matchTitleElement.attr("href");
-        if (!url.contains("cricket-scores")) {
-            return null;
-        }
-        String id = url.split(Pattern.quote("/"))[2];
-        // Model.Match Venue
-        String venue = null;
-        if (matchVenueElement != null) {
-            venue = matchVenueElement.text();
-        }
-        // Model.Match Status and Outcome
-        String outcome = null, status = null;
-        if (matchOutcomeElement != null) {
-            outcome = matchOutcomeElement.text();
-            status = matchInfoExtractor.extractStatus(matchOutcomeElement);
-        }
-        // Model.Match Format
-        String format = matchInfoExtractor.extractFormat(title, seriesFormats);
-        // Model.Match Winning Model.Team
-        String winningTeam = matchInfoExtractor.extractWinningTeam(status, outcome);
-
-        if (venue != null && status != null && format != null) {
-            return new Match(Config.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam, playerCacheMap);
-        }
-        return null;
-    }
-
-    private Match(String url, String id, String title, String format, String venue, String status, String outcome, String winningTeam, HashMap<String, Player> playerCacheMap) {
+    public Match(String url, String id, String title, String format, String venue, String status, String outcome, String winningTeam, HashMap<String, Player> playerCacheMap) {
         mUrl = url;
         mId = id;
         mTitle = title;
@@ -80,17 +42,13 @@ class Match {
         Document commentaryDoc = ScraperUtils.getDocument(this.getUrl());
 
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor(iScorecardDoc);
-        MatchScoreExtractor matchScoreExtractor = new MatchScoreExtractor();
-
-        this.setDate(matchInfoExtractor.extractMatchDate());
-        this.setTeams(matchInfoExtractor.extractPlayingTeams(iScorecardDoc, this.getTitle(), playerCacheMap));
-        this.setInningsScores(matchScoreExtractor.extractMatchScores(iScorecardDoc, this.getTeams()));
-
-        MatchCommentaryExtractor matchCommentaryExtractor = new MatchCommentaryExtractor(commentaryDoc, this.getTeams());
-        this.setHeadToHeadList(matchCommentaryExtractor.getHeadToHead());
+        mDate = matchInfoExtractor.extractMatchDate();
+        mTeams = matchInfoExtractor.extractPlayingTeams(iScorecardDoc, this.getTitle(), playerCacheMap);
+        mInningsScores = new MatchScoreExtractor().extractMatchScores(iScorecardDoc, this.getTeams());
+        mHeadToHeadList = new MatchCommentaryExtractor(commentaryDoc, this.getTeams()).getHeadToHead();
     }
 
-    public String getUrl() {
+    private String getUrl() {
         return mUrl;
     }
 
@@ -98,11 +56,11 @@ class Match {
         mUrl = url;
     }
 
-    public String getId() {
+    private String getId() {
         return mId;
     }
 
-    public String getTitle() {
+    private String getTitle() {
         return mTitle;
     }
 
@@ -130,7 +88,7 @@ class Match {
         return mWinningTeam;
     }
 
-    public ArrayList<Team> getTeams() {
+    private ArrayList<Team> getTeams() {
         return mTeams;
     }
 

@@ -1,5 +1,6 @@
 package Model;
 
+import Utility.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -37,7 +38,7 @@ public class PlayerBowlingScore {
         if (bowlerInfoElement == null) {
             return null;
         }
-        String playerName = Player.correctName(bowlerElement.text());
+        String playerName = StringUtils.correctPlayerName(bowlerElement.text());
         // [Overs, Maidens, Wickets, NB, Wides, Runs, Eco]
         ArrayList<String> scoreCols = new ArrayList<>(7);
         // [Overs, Maidens, Wickets, NB, Wides]

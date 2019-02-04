@@ -31,21 +31,21 @@ public class Team {
 
     public static String correctTeamName(String teamName) {
         switch (teamName) {
-            case "West Indies": return "Windies";
-            case "UAE": return "United Arab Emirates";
-            case "HK": return "Hong Kong";
-            case "Marylebone Cricket Club World XI": return "MCC World XI";
-            case "Pakistan U-19": return "Pakistan U19";
-            case "West Indies Women": return "Windies Women";
-            case "Rising Pune Supergiants": return "Rising Pune Supergiant";
-            case "St Lucia Zouks": return "St Lucia Stars";
-            case "Cobras": return "Cape Cobras";
-            case "West Indies U19": return "Windies U19";
-            case "West Indies A": return "Windies A";
-            case "Trinidad & Tobago": return "Trinidad and Tobago";
-            case "Wayamba": return "Wayamba Elevens";
-            case "RSA": return "South Africa";
-            case "SL": return "Sri Lanka";
+            case "west indies": return "windies";
+            case "uae": return "united arab emirates";
+            case "hk": return "hong kong";
+            case "marylebone cricket club world xi": return "mcc world xi";
+            case "pakistan u-19": return "pakistan u19";
+            case "west indies women": return "windies women";
+            case "rising pune supergiants": return "rising pune supergiant";
+            case "st lucia zouks": return "st lucia stars";
+            case "cobras": return "cape cobras";
+            case "west indies u19": return "windies u19";
+            case "west indies a": return "windies a";
+            case "trinidad & tobago": return "trinidad and tobago";
+            case "wayamba": return "wayamba elevens";
+            case "rsa": return "south africa";
+            case "sl": return "sri lanka";
             default:
                 return teamName;
         }

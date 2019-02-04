@@ -14,7 +14,7 @@ public class MatchScoreExtractor {
         Elements inningsElements = iScorecardDoc.select("div[id]");
         for (int inningNum = 0; inningNum < inningsElements.size(); inningNum++) {
             InningsScore inningsScore = extractInningsScoreHeader(inningsElements.get(inningNum), playingTeams, inningNum);
-            inningsScore.setPlayerBattingScores(extractInningsBattingScores(inningsElements.get(inningNum), inningsScore.getBattingTeam()));
+            inningsScore.setPlayerBattingScores(extractInningsBattingScores(inningsElements.get(inningNum)));
             inningsScore.setPlayerBowlingScores(extractInningsBowlingScores(inningsElements.get(inningNum)));
             inningsScores.add(inningsScore);
         }
@@ -30,7 +30,7 @@ public class MatchScoreExtractor {
         String battingTeam = inningsScoreData[0]
                 .replace(" 1st", "")
                 .replace(" 2nd", "")
-                .strip();
+                .strip().toLowerCase();
         String runs = inningsScoreData[1].split(Pattern.quote(" "))[0].split(Pattern.quote("-"))[0];
         String wickets = inningsScoreData[1].split(Pattern.quote(" "))[0].split(Pattern.quote("-"))[1];
         String overs = inningsScoreData[1].split(Pattern.quote(" "))[1].replace("(", "").replace(")", "").strip();
@@ -47,7 +47,7 @@ public class MatchScoreExtractor {
         return inningsScore;
     }
 
-    private ArrayList<PlayerBattingScore> extractInningsBattingScores(Element inningsElement, Team battingTeam) {
+    private ArrayList<PlayerBattingScore> extractInningsBattingScores(Element inningsElement) {
         ArrayList<PlayerBattingScore> playerBattingScores = new ArrayList<>();
         Element inningsBattingScoresElement = inningsElement.select("div.cb-col.cb-col-100.cb-ltst-wgt-hdr").first();
 

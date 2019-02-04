@@ -27,8 +27,8 @@ public class MatchCommentaryExtractor {
             String[] perBallCommentary = perBallCommentaryElement.text().split(Pattern.quote(","));
             String[] players = perBallCommentary[0].split(Pattern.quote(" to "));
             if (players.length >= 2) {
-                Pair<Player, Team> batsman = findPlayer(players[1].strip(), playerTeamHashMap);
-                Pair<Player, Team> bowler = findPlayer(players[0].strip(), playerTeamHashMap);
+                Pair<Player, Team> batsman = findPlayer(players[1].strip().toLowerCase(), playerTeamHashMap);
+                Pair<Player, Team> bowler = findPlayer(players[0].strip().toLowerCase(), playerTeamHashMap);
                 // Update Innings number in case of change in batting team
                 if (batsman.getSecond() != currentBattingTeam) {
                     inningsNumber += 1;
