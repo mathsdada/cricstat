@@ -1,4 +1,4 @@
-package Utility;
+package Scraper.Common;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

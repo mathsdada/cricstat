@@ -1,9 +1,8 @@
-package Extractor;
+package Scraper.Common;
 
-import Configuration.Config;
+import Common.Configuration;
 import Model.Player;
 import Model.Team;
-import Utility.ObjectBuilder;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -41,7 +40,7 @@ public class MatchInfoExtractor {
         String outcome = matchOutcomeElement.text().toLowerCase();
         for (int index = 0; index < pattern.length; index++) {
             if (outcome.contains(pattern[index])) {
-                return Config.MATCH_STATUS[index];
+                return Configuration.MATCH_STATUS[index];
             }
         }
         return null;
@@ -52,7 +51,7 @@ public class MatchInfoExtractor {
         seriesFormats = seriesFormats.toLowerCase();
 
         String[] pattern = {"practice", "warm-up", "unofficial", " t20", " odi", " test"};
-        String[] result = {null, null, null, Config.FORMATS[0], Config.FORMATS[1], Config.FORMATS[2]};
+        String[] result = {null, null, null, Configuration.FORMATS[0], Configuration.FORMATS[1], Configuration.FORMATS[2]};
         String[] inputs = {format, seriesFormats};
         for (String inputStr : inputs) {
             for (int index = 0; index < pattern.length; index++) {

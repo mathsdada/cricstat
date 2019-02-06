@@ -1,6 +1,6 @@
 package Model;
 
-import Utility.StringUtils;
+import Common.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -35,7 +35,7 @@ public class PlayerBattingScore {
             return null;
         }
         String playerName = StringUtils.correctPlayerName(batsmanElement.text());
-        // Model.Player Status
+        // Player Status
         String status = battingScoreElement.selectFirst("div.cb-col.cb-col-33").text();
         // [Runs, Balls, 4s, 6s, SR]
         ArrayList<String> scoreCols = new ArrayList<>(5);

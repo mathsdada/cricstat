@@ -1,10 +1,8 @@
-package Utility;
+package Scraper.Common;
 
-import Configuration.Config;
-import Extractor.MatchInfoExtractor;
+import Common.Configuration;
+import Common.StringUtils;
 import Model.Match;
-import Model.Player;
-import Model.Series;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -22,7 +20,7 @@ public class ObjectBuilder {
             }
             String seriesId = seriesUrl.split(Pattern.quote("/"))[2];
             String seriesTitle = seriesElement.text().toLowerCase();
-            return new Model.Series(seriesId, seriesTitle, year, Config.HOMEPAGE + seriesUrl);
+            return new Model.Series(seriesId, seriesTitle, year, Configuration.HOMEPAGE + seriesUrl);
         }
     }
     public static class Match {
@@ -32,7 +30,7 @@ public class ObjectBuilder {
             Elements matchTitleElement = matchElement.select("a.text-hvr-underline");
             Elements matchOutcomeElement = matchElement.select("a.cb-text-complete");
             Elements matchVenueElement = matchElement.select("div.text-gray");
-            // Model.Match Title & Link & ID
+            // Match Title & Link & ID
             String title = matchTitleElement.text().toLowerCase();
             String url = matchTitleElement.attr("href");
             if (url.contains("live-cricket-scores") ||
@@ -40,24 +38,28 @@ public class ObjectBuilder {
                 return null;
             }
             String id = url.split(Pattern.quote("/"))[2];
-            // Model.Match Venue
+            /* If matchID is already available in DB then do not scrape that match again */
+            if (Model.Match.dbOpCheckId(id)) {
+                return null;
+            }
+            // Match Venue
             String venue = null;
             if (matchVenueElement != null) {
                 venue = matchVenueElement.text().toLowerCase();
             }
-            // Model.Match Status and Outcome
+            // Match Status and Outcome
             String outcome = null, status = null;
             if (matchOutcomeElement != null) {
                 outcome = matchOutcomeElement.text().toLowerCase();
                 status = matchInfoExtractor.extractStatus(matchOutcomeElement);
             }
-            // Model.Match Format
+            // Match Format
             String format = matchInfoExtractor.extractFormat(title, seriesFormats);
-            // Model.Match Winning Model.Team
+            // Match Winning Team
             String winningTeam = matchInfoExtractor.extractWinningTeam(status, outcome);
 
             if (venue != null && status != null && format != null) {
-                return new Model.Match(Config.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam, playerCacheMap);
+                return new Model.Match(Configuration.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam, playerCacheMap);
             }
             return null;
         }
@@ -70,7 +72,7 @@ public class ObjectBuilder {
 
             String playerId = playerUrl.split(Pattern.quote("/"))[2];
             if(!playerCacheMap.containsKey(playerId)) {
-                HashMap<String, String> profileMap = getProfileMap(Config.HOMEPAGE + playerUrl);
+                HashMap<String, String> profileMap = getProfileMap(Configuration.HOMEPAGE + playerUrl);
                 playerCacheMap.put(playerId,
                         new Model.Player(playerId, playerName, profileMap.get("role"), profileMap.get("batting style"), profileMap.get("bowling style")));
             }

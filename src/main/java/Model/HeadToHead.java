@@ -1,8 +1,6 @@
 package Model;
 
-import Utility.Pair;
-
-import java.security.KeyPair;
+import Common.Pair;
 
 public class HeadToHead {
     private int mInningsNum;

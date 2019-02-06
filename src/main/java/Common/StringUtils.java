@@ -1,4 +1,4 @@
-package Utility;
+package Common;
 
 public class StringUtils {
     static public int longestCommonSubstringSize(String string_1, String string_b){

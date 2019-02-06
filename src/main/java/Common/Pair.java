@@ -1,4 +1,4 @@
-package Utility;
+package Common;
 
 public class Pair<F, S> {
     private F first;

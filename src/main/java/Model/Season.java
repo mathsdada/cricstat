@@ -1,8 +1,8 @@
 package Model;
 
-import Configuration.Config;
-import Utility.ObjectBuilder;
-import Utility.ScraperUtils;
+import Common.Configuration;
+import Scraper.Common.ObjectBuilder;
+import Scraper.Common.ScraperUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -22,7 +22,7 @@ public class Season {
     }
 
     private void extractSeriesList() {
-        String seasonUrl = Config.HOMEPAGE + "/cricket-scorecard-archives/" + mYear;
+        String seasonUrl = Configuration.HOMEPAGE + "/cricket-scorecard-archives/" + mYear;
         Document seasonDoc = ScraperUtils.getDocument(seasonUrl);
         Elements seriesElements = seasonDoc.select("a.text-hvr-underline");
         for (Element seriesElement: seriesElements) {

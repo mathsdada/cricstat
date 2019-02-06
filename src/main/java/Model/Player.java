@@ -1,14 +1,5 @@
 package Model;
 
-import Configuration.Config;
-import Utility.ScraperUtils;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.HashMap;
-import java.util.regex.Pattern;
-
 public class Player {
     private String mId;
     private String mName;

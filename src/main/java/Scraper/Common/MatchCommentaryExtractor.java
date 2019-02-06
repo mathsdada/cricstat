@@ -1,18 +1,17 @@
-package Extractor;
+package Scraper.Common;
 
+import Common.Pair;
+import Common.StringUtils;
 import Model.HeadToHead;
 import Model.HeadToHeadData;
 import Model.Player;
 import Model.Team;
-import Utility.Pair;
-import Utility.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.regex.Pattern;
 
 public class MatchCommentaryExtractor {

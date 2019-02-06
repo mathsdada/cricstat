@@ -1,6 +1,7 @@
-package Extractor;
+package Scraper.Common;
 
 import Model.*;
+import Scraper.Model.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

@@ -1,8 +1,7 @@
 package Model;
 
-import Configuration.Config;
-import Utility.ObjectBuilder;
-import Utility.ScraperUtils;
+import Scraper.Common.ObjectBuilder;
+import Scraper.Common.ScraperUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

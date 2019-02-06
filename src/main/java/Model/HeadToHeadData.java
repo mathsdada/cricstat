@@ -1,5 +1,5 @@
 package Model;
-import Utility.Pair;
+import Common.Pair;
 import java.util.regex.Pattern;
 
 public class HeadToHeadData {

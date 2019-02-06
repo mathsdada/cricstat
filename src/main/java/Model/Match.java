@@ -1,12 +1,16 @@
 package Model;
 
-import Configuration.Config;
-import Extractor.MatchCommentaryExtractor;
-import Extractor.MatchInfoExtractor;
-import Extractor.MatchScoreExtractor;
-import Utility.ScraperUtils;
+import Common.Configuration;
+import Scraper.Common.MatchCommentaryExtractor;
+import Scraper.Common.MatchInfoExtractor;
+import Scraper.Common.MatchScoreExtractor;
+import Scraper.Common.ScraperUtils;
 import org.jsoup.nodes.Document;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,8 +40,28 @@ public class Match {
         scrape(playerCacheMap);
     }
 
+    public static boolean dbOpCheckId(String id) {
+        boolean isIdPresentInDb = false;
+        try {
+            String SQL = "SELECT count(*) FROM match WHERE match.id = ?";
+            PreparedStatement preparedStatement = Database.getInstance().getPreparedStatement(SQL);
+            preparedStatement.setInt(1, Integer.parseInt(id));
+            {
+                ResultSet resultSet = preparedStatement.executeQuery();
+                resultSet.next();
+                isIdPresentInDb = (0!=resultSet.getInt(1));
+                resultSet.close();
+            }
+            preparedStatement.close();
+            return isIdPresentInDb;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return isIdPresentInDb;
+        }
+    }
+
     private void scrape(HashMap<String, Player> playerCacheMap) {
-        String scoreCardUrl = Config.HOMEPAGE + "/api/html/cricket-scorecard/" + this.getId();
+        String scoreCardUrl = Configuration.HOMEPAGE + "/api/html/cricket-scorecard/" + this.getId();
         Document iScorecardDoc = ScraperUtils.getDocument(scoreCardUrl);
         Document commentaryDoc = ScraperUtils.getDocument(this.getUrl());
 
