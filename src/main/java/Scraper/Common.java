@@ -1,12 +1,12 @@
-package Scraper.Common;
+package Scraper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
-public class ScraperUtils {
-    public static Document getDocument(String url) {
+public class Common {
+    static Document getDocument(String url) {
         return getDocumentInternal(url, 0);
     }
 

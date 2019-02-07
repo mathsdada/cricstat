@@ -1,11 +1,5 @@
 package Model;
 
-import Common.StringUtils;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.ArrayList;
-
 public class PlayerBowlingScore {
     private String mPlayer;
     private String mOvers;
@@ -16,7 +10,7 @@ public class PlayerBowlingScore {
     private String mWides;
     private String mEconomy;
 
-    private PlayerBowlingScore(String player,
+    public PlayerBowlingScore(String player,
                               String overs, String maidens, String wickets, String noBalls, String wides,
                               String runs, String economy) {
         mPlayer = player;
@@ -27,32 +21,6 @@ public class PlayerBowlingScore {
         mNoBalls = noBalls;
         mWides = wides;
         mEconomy = economy;
-    }
-
-    public static PlayerBowlingScore extractPlayerBowlingScore(Element bowlingScoreElement) {
-        Element bowlerElement = bowlingScoreElement.select("div.cb-col.cb-col-40").first();
-        if (bowlerElement == null) {
-            return null;
-        }
-        Element bowlerInfoElement = bowlerElement.selectFirst("a");
-        if (bowlerInfoElement == null) {
-            return null;
-        }
-        String playerName = StringUtils.correctPlayerName(bowlerElement.text());
-        // [Overs, Maidens, Wickets, NB, Wides, Runs, Eco]
-        ArrayList<String> scoreCols = new ArrayList<>(7);
-        // [Overs, Maidens, Wickets, NB, Wides]
-        Elements scorecardCols = bowlingScoreElement.select("div.cb-col.cb-col-8.text-right");
-        for (Element scorecardCol : scorecardCols) {
-            scoreCols.add(scorecardCol.text());
-        }
-        // [Runs, Eco]
-        scorecardCols = bowlingScoreElement.select("div.cb-col.cb-col-10.text-right");
-        for (Element scorecardCol : scorecardCols) {
-            scoreCols.add(scorecardCol.text());
-        }
-        return new PlayerBowlingScore(playerName, scoreCols.get(0), scoreCols.get(1), scoreCols.get(2), scoreCols.get(3),
-                scoreCols.get(4), scoreCols.get(5), scoreCols.get(6));
     }
 
     public String getPlayer() {

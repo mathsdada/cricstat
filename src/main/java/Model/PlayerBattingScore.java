@@ -1,11 +1,5 @@
 package Model;
 
-import Common.StringUtils;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.ArrayList;
-
 public class PlayerBattingScore {
     private String mPlayer;
     private String mStatus;
@@ -15,7 +9,7 @@ public class PlayerBattingScore {
     private String mSixes;
     private String mStrikeRate;
 
-    private PlayerBattingScore(String player, String status, String runs, String balls, String fours, String sixes, String strikeRate) {
+    public PlayerBattingScore(String player, String status, String runs, String balls, String fours, String sixes, String strikeRate) {
         mPlayer = player;
         mStatus = status;
         mRuns = runs;
@@ -23,28 +17,6 @@ public class PlayerBattingScore {
         mFours = fours;
         mSixes = sixes;
         mStrikeRate = strikeRate;
-    }
-
-    public static PlayerBattingScore extractPlayerBattingScore(Element battingScoreElement) {
-        Element batsmanElement = battingScoreElement.select("div.cb-col.cb-col-27").first();
-        if (batsmanElement == null) {
-            return null;
-        }
-        Element batsmanInfoElement = batsmanElement.selectFirst("a");
-        if (batsmanInfoElement == null) {
-            return null;
-        }
-        String playerName = StringUtils.correctPlayerName(batsmanElement.text());
-        // Player Status
-        String status = battingScoreElement.selectFirst("div.cb-col.cb-col-33").text();
-        // [Runs, Balls, 4s, 6s, SR]
-        ArrayList<String> scoreCols = new ArrayList<>(5);
-        Elements scorecardCols = battingScoreElement.select("div.cb-col.cb-col-8.text-right");
-        for (Element scorecardCol : scorecardCols) {
-            scoreCols.add(scorecardCol.text());
-        }
-        return new PlayerBattingScore(playerName, status, scoreCols.get(0), scoreCols.get(1), scoreCols.get(2),
-                scoreCols.get(3), scoreCols.get(4));
     }
 
     public String getPlayer() {

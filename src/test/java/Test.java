@@ -19,7 +19,7 @@ public class Test {
 //        } catch (SQLException e) {
 //            e.printStackTrace();
 //        }
-        Season season = new Season("2019");
+        Season season = Scraper.Season.build("2019");
         System.out.println(StringUtils.longestCommonSubstringSize("Virat Kohli", "Kohli"));
     }
 }

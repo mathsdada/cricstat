@@ -1,71 +1,29 @@
 package Model;
 
-import Common.Configuration;
-import Scraper.Common.ObjectBuilder;
-import Scraper.Common.ScraperUtils;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Season {
     private String mYear;
     private ArrayList<Series> mSeriesList;
 
-    public Season(String  year) {
+    public Season(String  year, ArrayList<Series> seriesList) {
         mYear = year;
-        mSeriesList = new ArrayList<>();
-        extractSeriesList();
+        mSeriesList = seriesList;
     }
 
-    private void extractSeriesList() {
-        String seasonUrl = Configuration.HOMEPAGE + "/cricket-scorecard-archives/" + mYear;
-        Document seasonDoc = ScraperUtils.getDocument(seasonUrl);
-        Elements seriesElements = seasonDoc.select("a.text-hvr-underline");
-        for (Element seriesElement: seriesElements) {
-            Series series = ObjectBuilder.Series.build(seriesElement, mYear);
-            if (series != null) {
-                mSeriesList.add(series);
-            }
-        }
-        runSeriesWorkerThreads(mSeriesList);
-    }
-
-    private void runSeriesWorkerThreads(ArrayList<Series> seriesList) {
-//        ExecutorService executor = Executors.newFixedThreadPool(10);
-        ExecutorService executor = Executors.newCachedThreadPool();
-        for (Series series: seriesList) {
-            Runnable worker = new SeriesWorkerThread(series);
-            executor.execute(worker);
-        }
-        executor.shutdown();
-        while (!executor.isTerminated()) {}
-        System.out.println("Finished all Worker Threads");
-    }
-
-    private class SeriesWorkerThread implements Runnable {
-        private Series mSeries;
-
-        SeriesWorkerThread(Series series) {
-            mSeries = series;
-        }
-
-        @Override
-        public void run() {
-            System.out.println(Thread.currentThread().getName() + mSeries.getTitle());
-            mSeries.scrape();
-        }
-    }
-
-    public String  getYear() {
+    public String getYear() {
         return mYear;
+    }
+
+    public void setYear(String year) {
+        mYear = year;
     }
 
     public ArrayList<Series> getSeriesList() {
         return mSeriesList;
     }
 
+    public void setSeriesList(ArrayList<Series> seriesList) {
+        mSeriesList = seriesList;
+    }
 }
