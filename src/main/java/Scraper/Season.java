@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 public class Season {
     public static Model.Season build(String year) {
+        /* Each worker thread fills seriesArrayList with Series.. So protect it with Mutex */
         ArrayList<Model.Series> seriesArrayList = new ArrayList<>();
         final Object seriesListMutex = new Object();
         Elements seriesElements = getSeriesElements(year);
@@ -46,17 +47,9 @@ public class Season {
         public void run() {
             Model.Series series = Series.build(mSeriesElement);
             if (series != null) {
-                System.out.println("Waiting for Mutex..." + Thread.currentThread().getName());
                 synchronized (mSeriesArrayListMutex) {
-                    System.out.println("Aquired Mutex..." + Thread.currentThread().getName());
                     mSeriesArrayList.add(series);
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
-                System.out.println("Released Mutex..." + Thread.currentThread().getName());
             }
         }
     }

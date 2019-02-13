@@ -1,26 +1,28 @@
 package Model;
 
 public class PlayerBattingScore {
-    private String mPlayer;
+    private Player mBatsman;
     private String mStatus;
     private String mRuns;
     private String mBalls;
     private String mFours;
     private String mSixes;
     private String mStrikeRate;
+    private Player mBowler;
 
-    public PlayerBattingScore(String player, String status, String runs, String balls, String fours, String sixes, String strikeRate) {
-        mPlayer = player;
+    public PlayerBattingScore(Player player, String status, String runs, String balls, String fours, String sixes, String strikeRate, Player bowler) {
+        mBatsman = player;
         mStatus = status;
         mRuns = runs;
         mBalls = balls;
         mFours = fours;
         mSixes = sixes;
         mStrikeRate = strikeRate;
+        mBowler = bowler;
     }
 
-    public String getPlayer() {
-        return mPlayer;
+    public Player getBatsman() {
+        return mBatsman;
     }
 
     public String getStatus() {
@@ -47,9 +49,13 @@ public class PlayerBattingScore {
         return mStrikeRate;
     }
 
+    public Player getBowler() {
+        return mBowler;
+    }
+
     @Override
     public String toString() {
-        return "Batting Score: \nName : " + mPlayer +
+        return "Batting Score: \nName : " + mBatsman +
                 "\nS : " + mStatus +
                 "\nR : " + mRuns +
                 "\nB : " + mBalls +

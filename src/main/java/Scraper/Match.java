@@ -3,11 +3,14 @@ package Scraper;
 import Common.Configuration;
 import Common.Pair;
 import Common.StringUtils;
+import Database.DatabaseEngine;
 import Model.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,8 +33,15 @@ class Match {
         }
         String id = url.split(Pattern.quote("/"))[2];
         /* If matchID is already available in DB then do not scrape that match again */
-        if (Model.Match.dbOpCheckId(id)) {
-            return null;
+        try {
+            Connection connection = DatabaseEngine.getInstance().getConnection();
+            if (Database.Match.isAvailable(connection, Integer.parseInt(id))) {
+                DatabaseEngine.getInstance().releaseConnection();
+                return null;
+            }
+            DatabaseEngine.getInstance().releaseConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         // Match Venue
         String venue = null;
@@ -65,8 +75,9 @@ class Match {
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor(iScorecardDoc);
         match.setDate(matchInfoExtractor.extractMatchDate());
         match.setTeams(matchInfoExtractor.extractPlayingTeams(iScorecardDoc, match.getTitle(), playerCacheMap));
-        match.setInningsScores(new MatchScoreExtractor().extractMatchScores(iScorecardDoc, match.getTeams()));
-        match.setHeadToHeadList(new MatchCommentaryExtractor(commentaryDoc, match.getTeams()).getHeadToHead());
+        HashMap<Model.Player, Team> playerTeamHashMap = getPlayerTeamHashMap(match.getTeams());
+        match.setInningsScores(new MatchScoreExtractor().extractMatchScores(iScorecardDoc, match.getTeams(), playerTeamHashMap));
+        match.setHeadToHeadList(new MatchCommentaryExtractor(commentaryDoc, playerTeamHashMap).getHeadToHead());
     }
 
     private static class MatchInfoExtractor {
@@ -122,7 +133,7 @@ class Match {
         String extractWinningTeam(String status, String outcome) {
             String winningTeam = null;
             if (status != null && outcome != null) {
-                if (status.equals("W")) {
+                if (status.equals("w")) {
                     if (outcome.contains(" won by ")) {
                         winningTeam = outcome.split(Pattern.quote(" won by "))[0];
                     } else {
@@ -135,15 +146,17 @@ class Match {
             return winningTeam;
         }
 
-        String extractMatchDate() {
+        Long extractMatchDate() {
             String dateStr = mMatchInfo.get("Date");
             //        Examples: 1) Friday, January 05, 2018 - Tuesday, January 09, 2018
             //                  2) Tuesday, February 13, 2018
             dateStr = dateStr.split(Pattern.quote(" - "))[0].strip();
             SimpleDateFormat inputSdf = new SimpleDateFormat("EEEE, MMM dd, yyyy");
-            SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd");
+//            SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                return outputSdf.format(inputSdf.parse(dateStr));
+                /* return Epoch Time */
+                return inputSdf.parse(dateStr).getTime();
+//                return outputSdf.format(inputSdf.parse(dateStr));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -190,13 +203,13 @@ class Match {
     }
 
     private static class MatchScoreExtractor {
-        ArrayList<InningsScore> extractMatchScores(Document iScorecardDoc, ArrayList<Team> playingTeams) {
+        ArrayList<InningsScore> extractMatchScores(Document iScorecardDoc, ArrayList<Team> playingTeams, HashMap<Model.Player, Team> playerTeamHashMap) {
             ArrayList<InningsScore> inningsScores = new ArrayList<>();
             Elements inningsElements = iScorecardDoc.select("div[id]");
             for (int inningNum = 0; inningNum < inningsElements.size(); inningNum++) {
                 InningsScore inningsScore = extractInningsScoreHeader(inningsElements.get(inningNum), playingTeams, inningNum);
-                inningsScore.setPlayerBattingScores(extractInningsBattingScores(inningsElements.get(inningNum)));
-                inningsScore.setPlayerBowlingScores(extractInningsBowlingScores(inningsElements.get(inningNum)));
+                inningsScore.setPlayerBattingScores(extractInningsBattingScores(inningsElements.get(inningNum), playerTeamHashMap));
+                inningsScore.setPlayerBowlingScores(extractInningsBowlingScores(inningsElements.get(inningNum), playerTeamHashMap));
                 inningsScores.add(inningsScore);
             }
             return inningsScores;
@@ -224,18 +237,18 @@ class Match {
                 bowlingTeamObj = playingTeams.get(0);
             }
             InningsScoreHeader scoreHeader = new InningsScoreHeader(runs, wickets, overs);
-            InningsScore inningsScore = new InningsScore(inningsNum, battingTeamObj, bowlingTeamObj);
+            InningsScore inningsScore = new InningsScore(inningsNum+1, battingTeamObj, bowlingTeamObj);
             inningsScore.setScoreHeader(scoreHeader);
             return inningsScore;
         }
 
-        private ArrayList<PlayerBattingScore> extractInningsBattingScores(Element inningsElement) {
+        private ArrayList<PlayerBattingScore> extractInningsBattingScores(Element inningsElement, HashMap<Model.Player, Team> playerTeamHashMap) {
             ArrayList<PlayerBattingScore> playerBattingScores = new ArrayList<>();
             Element inningsBattingScoresElement = inningsElement.select("div.cb-col.cb-col-100.cb-ltst-wgt-hdr").first();
 
             Elements battingScoreElements = inningsBattingScoresElement.select("div.cb-col.cb-col-100.cb-scrd-itms");
             for (Element battingScoreElement : battingScoreElements) {
-                PlayerBattingScore playerBattingScore = extractPlayerBattingScore(battingScoreElement);
+                PlayerBattingScore playerBattingScore = extractPlayerBattingScore(battingScoreElement, playerTeamHashMap);
                 if (playerBattingScore != null) {
                     playerBattingScores.add(playerBattingScore);
                 }
@@ -243,13 +256,13 @@ class Match {
             return playerBattingScores;
         }
 
-        private ArrayList<PlayerBowlingScore> extractInningsBowlingScores(Element inningsElement) {
+        private ArrayList<PlayerBowlingScore> extractInningsBowlingScores(Element inningsElement, HashMap<Model.Player, Team> playerTeamHashMap) {
             ArrayList<PlayerBowlingScore> playerBowlingScores = new ArrayList<>();
             Element inningsBowlingScoresElement = inningsElement.select("div.cb-col.cb-col-100.cb-ltst-wgt-hdr").last();
 
             Elements bowlingScoreElements = inningsBowlingScoresElement.select("div.cb-col.cb-col-100.cb-scrd-itms");
             for (Element bowlingScoreElement : bowlingScoreElements) {
-                PlayerBowlingScore playerBowlingScore = extractPlayerBowlingScore(bowlingScoreElement);
+                PlayerBowlingScore playerBowlingScore = extractPlayerBowlingScore(bowlingScoreElement, playerTeamHashMap);
                 if (playerBowlingScore != null) {
                     playerBowlingScores.add(playerBowlingScore);
                 }
@@ -257,7 +270,7 @@ class Match {
             return playerBowlingScores;
         }
 
-        static PlayerBattingScore extractPlayerBattingScore(Element battingScoreElement) {
+        static PlayerBattingScore extractPlayerBattingScore(Element battingScoreElement, HashMap<Model.Player, Team> playerTeamHashMap) {
             Element batsmanElement = battingScoreElement.select("div.cb-col.cb-col-27").first();
             if (batsmanElement == null) {
                 return null;
@@ -266,20 +279,32 @@ class Match {
             if (batsmanInfoElement == null) {
                 return null;
             }
-            String playerName = StringUtils.correctPlayerName(batsmanElement.text());
-            // Player Status
-            String status = battingScoreElement.selectFirst("div.cb-col.cb-col-33").text();
+            String batsmanName = StringUtils.correctPlayerName(batsmanElement.text());
             // [Runs, Balls, 4s, 6s, SR]
             ArrayList<String> scoreCols = new ArrayList<>(5);
             Elements scorecardCols = battingScoreElement.select("div.cb-col.cb-col-8.text-right");
             for (Element scorecardCol : scorecardCols) {
                 scoreCols.add(scorecardCol.text());
             }
-            return new PlayerBattingScore(playerName, status, scoreCols.get(0), scoreCols.get(1), scoreCols.get(2),
-                    scoreCols.get(3), scoreCols.get(4));
+            // Player Status
+            String status = battingScoreElement.selectFirst("div.cb-col.cb-col-33").text();
+            String bowlerName = null;
+            if (status.contains("b ")) {
+                String[] temp = status.split(Pattern.quote("b "));
+                status = temp[0];
+                bowlerName = temp[1];
+            }
+            Pair<Model.Player, Team> batsman = findPlayer(batsmanName, playerTeamHashMap);
+            Pair<Model.Player, Team> bowler = new Pair<Model.Player, Team>(null, null);
+            if (bowlerName != null) {
+                bowler =  findPlayer(bowlerName, playerTeamHashMap);
+            }
+
+            return new PlayerBattingScore(batsman.getFirst(), status, scoreCols.get(0), scoreCols.get(1), scoreCols.get(2),
+                    scoreCols.get(3), scoreCols.get(4), bowler.getFirst());
         }
 
-        static PlayerBowlingScore extractPlayerBowlingScore(Element bowlingScoreElement) {
+        static PlayerBowlingScore extractPlayerBowlingScore(Element bowlingScoreElement, HashMap<Model.Player, Team> playerTeamHashMap) {
             Element bowlerElement = bowlingScoreElement.select("div.cb-col.cb-col-40").first();
             if (bowlerElement == null) {
                 return null;
@@ -301,7 +326,8 @@ class Match {
             for (Element scorecardCol : scorecardCols) {
                 scoreCols.add(scorecardCol.text());
             }
-            return new PlayerBowlingScore(playerName, scoreCols.get(0), scoreCols.get(1), scoreCols.get(2), scoreCols.get(3),
+            Pair<Model.Player, Team> bowler =  findPlayer(playerName, playerTeamHashMap);
+            return new PlayerBowlingScore(bowler.getFirst(), scoreCols.get(0), scoreCols.get(1), scoreCols.get(2), scoreCols.get(3),
                     scoreCols.get(4), scoreCols.get(5), scoreCols.get(6));
         }
 
@@ -311,8 +337,7 @@ class Match {
         private HashMap<Integer, HashMap<Model.Player, HashMap<Model.Player, HeadToHead>>>
                 mHeadToHeadPerInningsCache = new HashMap<>();
 
-        MatchCommentaryExtractor(Document commentaryDoc, ArrayList<Team> teams) {
-            HashMap<Model.Player, Team> playerTeamHashMap = getPlayerTeamHashMap(teams);
+        MatchCommentaryExtractor(Document commentaryDoc, HashMap<Model.Player, Team> playerTeamHashMap) {
             Team currentBattingTeam = null;
             int inningsNumber = 0;
             Elements perBallCommentaryElements = commentaryDoc.select("p.cb-col.cb-col-90.cb-com-ln");
@@ -365,27 +390,28 @@ class Match {
             }
             return mHeadToHeadPerInningsCache.get(inningsNumber).get(batsman.getFirst()).get(bowler.getFirst());
         }
+    }
 
-        private HashMap<Model.Player, Team> getPlayerTeamHashMap(ArrayList<Team> teams) {
-            HashMap<Model.Player, Team> playerTeamHashMap = new HashMap<>();
-            for (Team team: teams) {
-                for (Model.Player player: team.getSquad()) {
-                    playerTeamHashMap.put(player, team);
-                }
+    private static HashMap<Model.Player, Team> getPlayerTeamHashMap(ArrayList<Team> teams) {
+        HashMap<Model.Player, Team> playerTeamHashMap = new HashMap<>();
+        for (Team team: teams) {
+            for (Model.Player player: team.getSquad()) {
+                playerTeamHashMap.put(player, team);
             }
-            return playerTeamHashMap;
         }
-        private Pair<Model.Player, Team> findPlayer(String name, HashMap<Model.Player, Team> playerTeamHashMap) {
-            Model.Player resPlayer = null;
-            int curMaxLen = -1;
-            for (Model.Player player : playerTeamHashMap.keySet()) {
-                int curMatchLen = StringUtils.longestCommonSubstringSize(name, player.getName());
-                if (curMatchLen > curMaxLen) {
-                    curMaxLen = curMatchLen;
-                    resPlayer = player;
-                }
+        return playerTeamHashMap;
+    }
+
+    private static Pair<Model.Player, Team> findPlayer(String name, HashMap<Model.Player, Team> playerTeamHashMap) {
+        Model.Player resPlayer = null;
+        int curMaxLen = -1;
+        for (Model.Player player : playerTeamHashMap.keySet()) {
+            int curMatchLen = StringUtils.longestCommonSubstringSize(name, player.getName());
+            if (curMatchLen > curMaxLen) {
+                curMaxLen = curMatchLen;
+                resPlayer = player;
             }
-            return new Pair<>(resPlayer, playerTeamHashMap.get(resPlayer));
         }
+        return new Pair<>(resPlayer, playerTeamHashMap.get(resPlayer));
     }
 }

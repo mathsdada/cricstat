@@ -38,30 +38,4 @@ public class Series {
     public void setMatches(ArrayList<Match> matches) {
         mMatches = matches;
     }
-
-    /* DB Operations */
-    public boolean insertSeries(Connection connection) throws SQLException {
-        if (!findSeriesById(connection, Integer.parseInt(mId))) {
-            String SQL = "INSERT INTO series VALUES(?, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-            preparedStatement.setInt(1, Integer.parseInt(mId));
-            preparedStatement.setString(2, mTitle);
-            preparedStatement.setString(3, "Men");
-//            preparedStatement.setString(4, mYear);
-
-            return (0 != preparedStatement.executeUpdate());
-        } else {
-            System.out.println("Series Available in DB : " + mId);
-            return false;
-        }
-    }
-
-    private boolean findSeriesById(Connection connection, int id) throws SQLException {
-        String SQL = "SELECT count(*) FROM series WHERE series.id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(SQL);
-        preparedStatement.setInt(1, id);
-        ResultSet resultSet =preparedStatement.executeQuery();
-        resultSet.next();
-        return (0!=resultSet.getInt(1));
-    }
 }

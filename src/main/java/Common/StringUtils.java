@@ -54,4 +54,11 @@ public class StringUtils {
                 return teamName;
         }
     }
+
+    public static String getGender(String title) {
+        if (title.toLowerCase().contains("women")) {
+            return "women";
+        }
+        return "men";
+    }
 }

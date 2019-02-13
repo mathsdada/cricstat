@@ -35,4 +35,8 @@ public class HeadToHead {
             HeadToHeadData.add(mHeadToHeadData, headToHeadData);
         }
     }
+
+    public int getInningsNum() {
+        return mInningsNum;
+    }
 }

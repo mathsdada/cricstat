@@ -1,7 +1,7 @@
 package Model;
 
 public class PlayerBowlingScore {
-    private String mPlayer;
+    private Player mPlayer;
     private String mOvers;
     private String mMaidens;
     private String mRuns;
@@ -10,7 +10,7 @@ public class PlayerBowlingScore {
     private String mWides;
     private String mEconomy;
 
-    public PlayerBowlingScore(String player,
+    public PlayerBowlingScore(Player player,
                               String overs, String maidens, String wickets, String noBalls, String wides,
                               String runs, String economy) {
         mPlayer = player;
@@ -23,7 +23,7 @@ public class PlayerBowlingScore {
         mEconomy = economy;
     }
 
-    public String getPlayer() {
+    public Player getPlayer() {
         return mPlayer;
     }
 

@@ -11,7 +11,7 @@ public class Match {
     private String mTitle;
     private String mFormat;
     private String mVenue;
-    private String mDate;
+    private Long mDate; /* Epoch */
     private String mStatus;
     private String mOutcome;
     private String mWinningTeam;
@@ -70,11 +70,11 @@ public class Match {
         mVenue = venue;
     }
 
-    public String getDate() {
+    public Long getDate() {
         return mDate;
     }
 
-    public void setDate(String date) {
+    public void setDate(Long date) {
         mDate = date;
     }
 
@@ -125,28 +125,5 @@ public class Match {
     public void setHeadToHeadList(ArrayList<HeadToHead> headToHeadList) {
         mHeadToHeadList = headToHeadList;
     }
-
-    public static boolean dbOpCheckId(String id) {
-        boolean isIdPresentInDb = false;
-//        try {
-//            String SQL = "SELECT count(*) FROM match WHERE match.id = ?";
-//            PreparedStatement preparedStatement = Database.getInstance().getPreparedStatement(SQL);
-//            preparedStatement.setInt(1, Integer.parseInt(id));
-//            {
-//                ResultSet resultSet = preparedStatement.executeQuery();
-//                resultSet.next();
-//                isIdPresentInDb = (0!=resultSet.getInt(1));
-//                resultSet.close();
-//            }
-//            preparedStatement.close();
-//            return isIdPresentInDb;
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return isIdPresentInDb;
-//        }
-        return isIdPresentInDb;
-    }
-
-
 }
 

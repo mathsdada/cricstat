@@ -1,7 +1,7 @@
 package Common;
 
 public class Configuration {
-    public static final String[] MATCH_STATUS = {"T", "W", "D", "NR", "NR"};
-    public static final String[] FORMATS = {"T20", "ONE-DAY", "TEST"};
+    public static final String[] MATCH_STATUS = {"t", "w", "d", "nr", "nr"};
+    public static final String[] FORMATS = {"t20", "od", "test"};
     public static final String HOMEPAGE = "https://www.cricbuzz.com" ;
 }

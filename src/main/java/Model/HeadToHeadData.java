@@ -11,16 +11,16 @@ public class HeadToHeadData {
     private int mSixes;
     private int mNoBall;
     private static Pair[] ballOutcomePatterns = new Pair[]{
-            new Pair<String, HeadToHeadData>("out ", new HeadToHeadData(1, 0, 1, 1, 0, 0, 0)),
+            new Pair<String, HeadToHeadData>("out ",    new HeadToHeadData(1, 0, 1, 1, 0, 0, 0)),
             new Pair<String, HeadToHeadData>("no ball", new HeadToHeadData(1, 0, 0, 0, 0, 0, 1)),
-            new Pair<String, HeadToHeadData>("wide", new HeadToHeadData(0, 0, 0, 0, 0, 0, 0)),
-            new Pair<String, HeadToHeadData>("byes", new HeadToHeadData(1, 0, 0, 0, 0, 0, 0)),
-            new Pair<String, HeadToHeadData>("SIX", new HeadToHeadData(1, 6, 0, 0, 0, 1, 0)),
-            new Pair<String, HeadToHeadData>("FOUR", new HeadToHeadData(1, 4, 0, 0, 1, 0, 0)),
-            new Pair<String, HeadToHeadData>("1 run", new HeadToHeadData(1, 1, 0, 0, 0, 0, 0)),
-            new Pair<String, HeadToHeadData>("2 runs", new HeadToHeadData(1, 2, 0, 0, 0, 0, 0)),
-            new Pair<String, HeadToHeadData>("3 runs", new HeadToHeadData(1, 3, 0, 0, 0, 0, 0)),
-            new Pair<String, HeadToHeadData>("no run", new HeadToHeadData(1, 0, 0, 1, 0, 0, 0))
+            new Pair<String, HeadToHeadData>("wide",    new HeadToHeadData(0, 0, 0, 0, 0, 0, 0)),
+            new Pair<String, HeadToHeadData>("byes",    new HeadToHeadData(1, 0, 0, 0, 0, 0, 0)),
+            new Pair<String, HeadToHeadData>("SIX",     new HeadToHeadData(1, 6, 0, 0, 0, 1, 0)),
+            new Pair<String, HeadToHeadData>("FOUR",    new HeadToHeadData(1, 4, 0, 0, 1, 0, 0)),
+            new Pair<String, HeadToHeadData>("1 run",   new HeadToHeadData(1, 1, 0, 0, 0, 0, 0)),
+            new Pair<String, HeadToHeadData>("2 runs",  new HeadToHeadData(1, 2, 0, 0, 0, 0, 0)),
+            new Pair<String, HeadToHeadData>("3 runs",  new HeadToHeadData(1, 3, 0, 0, 0, 0, 0)),
+            new Pair<String, HeadToHeadData>("no run",  new HeadToHeadData(1, 0, 0, 1, 0, 0, 0))
     };
 
     public static HeadToHeadData extractHeadToHeadData(String inputStr1, String inputStr2) {

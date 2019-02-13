@@ -1,20 +1,20 @@
-package Model;
+package Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class Database {
-    private static Database ourInstance = new Database();
-    public static Database getInstance() {
+public class DatabaseEngine {
+    private static DatabaseEngine ourInstance = new DatabaseEngine();
+    public static DatabaseEngine getInstance() {
         return ourInstance;
     }
 
     private Connection mConnection;
     private int mUsageCount = 0;
     private final Object mMutex = new Object();
-    private Database() {
+    private DatabaseEngine() {
         try {
             mConnection = DriverManager.getConnection("jdbc:postgresql://localhost/cricstat", "mathsdada", "1@gangadhar");
         } catch (SQLException e) {
