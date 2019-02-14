@@ -1,23 +1,25 @@
 package Model;
 
+import java.math.BigDecimal;
+
 public class PlayerBattingScore {
     private Player mBatsman;
     private String mStatus;
-    private String mRuns;
-    private String mBalls;
-    private String mFours;
-    private String mSixes;
-    private String mStrikeRate;
+    private int mRuns;
+    private int mBalls;
+    private int mFours;
+    private int mSixes;
+    private BigDecimal mStrikeRate;
     private Player mBowler;
 
     public PlayerBattingScore(Player player, String status, String runs, String balls, String fours, String sixes, String strikeRate, Player bowler) {
         mBatsman = player;
         mStatus = status;
-        mRuns = runs;
-        mBalls = balls;
-        mFours = fours;
-        mSixes = sixes;
-        mStrikeRate = strikeRate;
+        mRuns = Integer.parseInt(runs);
+        mBalls = Integer.parseInt(balls);
+        mFours = Integer.parseInt(fours);
+        mSixes = Integer.parseInt(sixes);
+        mStrikeRate = new BigDecimal(strikeRate);
         mBowler = bowler;
     }
 
@@ -29,23 +31,23 @@ public class PlayerBattingScore {
         return mStatus;
     }
 
-    public String getRuns() {
+    public int getRuns() {
         return mRuns;
     }
 
-    public String getBalls() {
+    public int getBalls() {
         return mBalls;
     }
 
-    public String getFours() {
+    public int getFours() {
         return mFours;
     }
 
-    public String getSixes() {
+    public int getSixes() {
         return mSixes;
     }
 
-    public String getStrikeRate() {
+    public BigDecimal getStrikeRate() {
         return mStrikeRate;
     }
 

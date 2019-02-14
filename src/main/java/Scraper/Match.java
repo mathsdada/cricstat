@@ -56,11 +56,9 @@ class Match {
         }
         // Match Format
         String format = matchInfoExtractor.extractFormat(title, seriesFormats);
-        // Match Winning Team
-        String winningTeam = matchInfoExtractor.extractWinningTeam(status, outcome);
 
         if (venue != null && status != null && format != null) {
-            Model.Match match = new Model.Match(Configuration.HOMEPAGE + url, id, title, format, venue, status, outcome, winningTeam);
+            Model.Match match = new Model.Match(Configuration.HOMEPAGE + url, id, title, format, venue, status, outcome);
             scrape(match, playerCacheMap);
             return match;
         }
@@ -75,6 +73,7 @@ class Match {
         MatchInfoExtractor matchInfoExtractor = new MatchInfoExtractor(iScorecardDoc);
         match.setDate(matchInfoExtractor.extractMatchDate());
         match.setTeams(matchInfoExtractor.extractPlayingTeams(iScorecardDoc, match.getTitle(), playerCacheMap));
+        match.setWinningTeam(matchInfoExtractor.extractWinningTeam(match.getStatus(), match.getOutcome(), match.getTeams()));
         HashMap<Model.Player, Team> playerTeamHashMap = getPlayerTeamHashMap(match.getTeams());
         match.setInningsScores(new MatchScoreExtractor().extractMatchScores(iScorecardDoc, match.getTeams(), playerTeamHashMap));
         match.setHeadToHeadList(new MatchCommentaryExtractor(commentaryDoc, playerTeamHashMap).getHeadToHead());
@@ -103,11 +102,14 @@ class Match {
 
         String extractStatus(Elements matchOutcomeElement) {
             String[] pattern = {"match tied", " won by ", "match drawn", " abandoned", "no result"};
+            String[] result = {Configuration.MatchStatus.TIE, Configuration.MatchStatus.WIN,
+                               Configuration.MatchStatus.DRAW, Configuration.MatchStatus.NR,
+                               Configuration.MatchStatus.NR};
 
             String outcome = matchOutcomeElement.text().toLowerCase();
             for (int index = 0; index < pattern.length; index++) {
                 if (outcome.contains(pattern[index])) {
-                    return Configuration.MATCH_STATUS[index];
+                    return result[index];
                 }
             }
             return null;
@@ -118,7 +120,8 @@ class Match {
             seriesFormats = seriesFormats.toLowerCase();
 
             String[] pattern = {"practice", "warm-up", "unofficial", " t20", " odi", " test"};
-            String[] result = {null, null, null, Configuration.FORMATS[0], Configuration.FORMATS[1], Configuration.FORMATS[2]};
+            String[] result = {null, null, null, Configuration.MatchFormat.T20, Configuration.MatchFormat.OD,
+                               Configuration.MatchFormat.TEST};
             String[] inputs = {format, seriesFormats};
             for (String inputStr : inputs) {
                 for (int index = 0; index < pattern.length; index++) {
@@ -130,19 +133,21 @@ class Match {
             return null;
         }
 
-        String extractWinningTeam(String status, String outcome) {
+        String extractWinningTeam(String status, String outcome, ArrayList<Team> teams) {
             String winningTeam = null;
             if (status != null && outcome != null) {
-                if (status.equals("w")) {
+                if (status.equals(Configuration.MatchStatus.WIN)) {
                     if (outcome.contains(" won by ")) {
                         winningTeam = outcome.split(Pattern.quote(" won by "))[0];
                     } else {
                         winningTeam = outcome.split(Pattern.quote(" Won by "))[0];
                     }
-                    winningTeam = StringUtils.correctTeamName(winningTeam.strip());
                 }
             }
-            if (winningTeam != null) winningTeam = winningTeam.toLowerCase();
+            if (winningTeam != null) {
+                winningTeam = StringUtils.getCloseMatch(winningTeam.toLowerCase(),
+                                                        new String[]{teams.get(0).getName(), teams.get(1).getName()});
+            }
             return winningTeam;
         }
 
@@ -152,11 +157,9 @@ class Match {
             //                  2) Tuesday, February 13, 2018
             dateStr = dateStr.split(Pattern.quote(" - "))[0].strip();
             SimpleDateFormat inputSdf = new SimpleDateFormat("EEEE, MMM dd, yyyy");
-//            SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 /* return Epoch Time */
                 return inputSdf.parse(dateStr).getTime();
-//                return outputSdf.format(inputSdf.parse(dateStr));
             } catch (ParseException e) {
                 e.printStackTrace();
             }

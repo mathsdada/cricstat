@@ -35,8 +35,8 @@ public class PlayerBowlingScore {
 
     public static void insert(Connection connection, int playerId, int matchId, int inningsNum,
                               String teamPlayedFor, String teamPlayedAgainst,
-                              String oversBowled, int numMaidens, int runsGiven, int wicketsTaken, int numNoBalls,
-                              int numWides, String economy) throws SQLException {
+                              BigDecimal oversBowled, int numMaidens, int runsGiven, int wicketsTaken, int numNoBalls,
+                              int numWides, BigDecimal economy) throws SQLException {
         String SQL = "INSERT INTO player_bowling_score VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(SQL);
 
@@ -45,13 +45,13 @@ public class PlayerBowlingScore {
         preparedStatement.setInt(3, inningsNum);
         preparedStatement.setString(4, teamPlayedFor);
         preparedStatement.setString(5, teamPlayedAgainst);
-        preparedStatement.setBigDecimal(6, new BigDecimal(oversBowled));
+        preparedStatement.setBigDecimal(6, oversBowled);
         preparedStatement.setInt(7, numMaidens);
         preparedStatement.setInt(8, runsGiven);
         preparedStatement.setInt(9, wicketsTaken);
         preparedStatement.setInt(10, numNoBalls);
         preparedStatement.setInt(11, numWides);
-        preparedStatement.setBigDecimal(12, new BigDecimal(economy));
+        preparedStatement.setBigDecimal(12, economy);
 
         preparedStatement.executeUpdate();
         preparedStatement.close();

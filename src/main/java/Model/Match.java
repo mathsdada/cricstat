@@ -1,13 +1,10 @@
 package Model;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Match {
     private String mUrl;
-    private String mId;
+    private int mId;
     private String mTitle;
     private String mFormat;
     private String mVenue;
@@ -19,15 +16,14 @@ public class Match {
     private ArrayList<InningsScore> mInningsScores;
     private ArrayList<HeadToHead> mHeadToHeadList;
 
-    public Match(String url, String id, String title, String format, String venue, String status, String outcome, String winningTeam) {
+    public Match(String url, String id, String title, String format, String venue, String status, String outcome) {
         mUrl = url;
-        mId = id;
+        mId = Integer.parseInt(id);
         mTitle = title;
         mFormat = format;
         mVenue = venue;
         mStatus = status;
         mOutcome = outcome;
-        mWinningTeam = winningTeam;
     }
 
     public String getUrl() {
@@ -38,11 +34,11 @@ public class Match {
         mUrl = url;
     }
 
-    public String getId() {
+    public int getId() {
         return mId;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         mId = id;
     }
 

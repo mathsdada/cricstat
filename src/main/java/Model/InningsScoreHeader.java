@@ -1,25 +1,27 @@
 package Model;
 
+import java.math.BigDecimal;
+
 public class InningsScoreHeader {
-    private String mRuns;
-    private String mWickets;
-    private String mOvers;
+    private int mRuns;
+    private int mWickets;
+    private BigDecimal mOvers;
 
     public InningsScoreHeader(String mRuns, String mWickets, String mOvers) {
-        this.mRuns = mRuns;
-        this.mWickets = mWickets;
-        this.mOvers = mOvers;
+        this.mRuns = Integer.parseInt(mRuns);
+        this.mWickets = Integer.parseInt(mWickets);
+        this.mOvers = new BigDecimal(mOvers);
     }
 
-    public String getRuns() {
+    public int getRuns() {
         return mRuns;
     }
 
-    public String getWickets() {
+    public int getWickets() {
         return mWickets;
     }
 
-    public String getOvers() {
+    public BigDecimal getOvers() {
         return mOvers;
     }
 }

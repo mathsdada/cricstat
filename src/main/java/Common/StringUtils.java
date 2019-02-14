@@ -19,6 +19,19 @@ public class StringUtils {
         return max;
     }
 
+    static public String getCloseMatch(String inputStr, String[] StrArray) {
+        int curMaxLen = -1;
+        String outputStr = null;
+        for (String curStr : StrArray) {
+            int curMatchLen = longestCommonSubstringSize(inputStr, curStr);
+            if (curMatchLen > curMaxLen) {
+                curMaxLen = curMatchLen;
+                outputStr = curStr;
+            }
+        }
+        return outputStr;
+    }
+
     public static String correctPlayerName(String name) {
         name = name
                 .replace("(c)", "")
@@ -31,28 +44,6 @@ public class StringUtils {
             name = name.replace(" Sub", "").strip();
         }
         return name;
-    }
-
-    public static String correctTeamName(String teamName) {
-        switch (teamName) {
-            case "west indies": return "windies";
-            case "uae": return "united arab emirates";
-            case "hk": return "hong kong";
-            case "marylebone cricket club world xi": return "mcc world xi";
-            case "pakistan u-19": return "pakistan u19";
-            case "west indies women": return "windies women";
-            case "rising pune supergiants": return "rising pune supergiant";
-            case "st lucia zouks": return "st lucia stars";
-            case "cobras": return "cape cobras";
-            case "west indies u19": return "windies u19";
-            case "west indies a": return "windies a";
-            case "trinidad & tobago": return "trinidad and tobago";
-            case "wayamba": return "wayamba elevens";
-            case "rsa": return "south africa";
-            case "sl": return "sri lanka";
-            default:
-                return teamName;
-        }
     }
 
     public static String getGender(String title) {

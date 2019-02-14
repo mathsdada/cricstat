@@ -22,7 +22,7 @@ public class InningsScore {
         )
      */
     public static void insert(Connection connection, int matchId, int inningsNum, String battingTeam,
-                              String bowlingTeam, String runs, String wickets, String overs) throws SQLException {
+                              String bowlingTeam, int runs, int wickets, BigDecimal overs) throws SQLException {
         String SQL = "INSERT INTO innings_score VALUES(?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(SQL);
 
@@ -30,9 +30,9 @@ public class InningsScore {
         preparedStatement.setInt(2, inningsNum);
         preparedStatement.setString(3, battingTeam);
         preparedStatement.setString(4, bowlingTeam);
-        preparedStatement.setInt(5, Integer.parseInt(runs));
-        preparedStatement.setInt(6, Integer.parseInt(wickets));
-        preparedStatement.setBigDecimal(7, new BigDecimal(overs));
+        preparedStatement.setInt(5, runs);
+        preparedStatement.setInt(6, wickets);
+        preparedStatement.setBigDecimal(7, overs);
 
         preparedStatement.executeUpdate();
         preparedStatement.close();

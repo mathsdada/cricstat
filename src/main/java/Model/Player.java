@@ -1,7 +1,7 @@
 package Model;
 
 public class Player {
-    private String mId;
+    private int mId;
     private String mName;
     private String mRole;
     private String mBattingStyle;
@@ -9,14 +9,14 @@ public class Player {
 
 
     public Player(String id, String name, String role, String battingStyle, String bowlingStyle) {
-        mId = id;
+        mId = Integer.parseInt(id);
         mName = name;
         mRole = role;
         mBattingStyle = battingStyle;
         mBowlingStyle = bowlingStyle;
     }
 
-    public String getId() {
+    public int getId() {
         return mId;
     }
 

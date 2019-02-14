@@ -4,22 +4,22 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Series {
-    private String mId;
+    private int mId;
     private String mTitle;
     private ArrayList<Match> mMatches;
 
 
     public Series(String id, String title, ArrayList<Match> matches) {
-        mId = id;
+        mId = Integer.parseInt(id);
         mTitle = title;
         mMatches = matches;
     }
 
-    public String getId() {
+    public int getId() {
         return mId;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         mId = id;
     }
 
